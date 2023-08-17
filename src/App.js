@@ -18,6 +18,15 @@ function App() {
       setweb3(web3Instance);
       try {
         await window.ethereum.enable();
+
+        const accounts = await web3Instance.eth.getAccounts();
+        console.log(accounts[0]);
+        setAccount(accounts[0]);
+
+        const balanceWei = await web3Instance.eth.getBalance(accounts[0]);
+        const balanceEth = web3Instance.utils.fromWei(balanceWei, "ether");
+        setBalance(balanceEth);
+        console.log(balanceEth);
       } catch (error) {
         console.error(error);
       }
@@ -42,7 +51,11 @@ function App() {
     <div>
       {MetaMask ? (
         <>
-          <Menu conectarWallet={conectarWallet} />
+          <Menu
+            conectarWallet={conectarWallet}
+            mostrarDireccion={account}
+            mostrarBalance={balance}
+          />
           <div className="centro">
             <Formulario />
           </div>
