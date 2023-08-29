@@ -1,6 +1,6 @@
-import React from "react"
-import './menu.css'
-import cerdo from './img/cerdoIcon.png'
+import React from "react";
+import './css/menu.css';
+import cerdo from './img/cerdoIcon.png';
 
 export default function Menu(props) {
 

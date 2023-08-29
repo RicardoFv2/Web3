@@ -1,6 +1,7 @@
 import "./App.css";
 import Formulario from "./components/form";
 import Menu from "./components/menu";
+import ListarData from "./components/listarData";
 import { useState, useEffect } from "react";
 import Web3 from "web3";
 import smartContractRegistro from "./registro.json";
@@ -12,7 +13,10 @@ function App() {
   const [balance, setBalance] = useState(null);
   const [contract, setContract] = useState();
 
-
+  const [ListarInformacionEstudios, setListarInformacionEstudios] = useState(
+    []
+  );
+  console.log("ListarInformacionEstudios =>", ListarInformacionEstudios);
 
   const conectarWallet = async () => {
     console.log("Conectar Wallet");
@@ -46,19 +50,46 @@ function App() {
     }
   };
 
-  const ListarRegistros = async () =>{
+  const ListarRegistros = async () => {
     console.log("contract==>", contract);
     if (contract) {
       try {
-        const contadorRegistro = await contract.methods.registroCounter().call();
-        console.log("contadorRegistros ==>", contadorRegistro);
+        const contadorRegistro = await contract.methods
+          .registroCounter()
+          .call();
+
+        let arrayEstudio = [];
+
+        for (let i = 1; i <= contadorRegistro; i++) {
+          const inforestuido = await contract.methods.estudios(i).call();
+          console.log(inforestuido);
+
+          if (inforestuido.categoria != " ") {
+            const estudio = {
+              categoria: inforestuido.categoria,
+              creatAtl: inforestuido.creatAtl,
+              fechFin: inforestuido.fechaFin,
+              fechaInicio: inforestuido.fechaInicio,
+              id: inforestuido.id,
+              lugarDeFormación: inforestuido.lugarDeFormación,
+              tituloEstudio: inforestuido.tituloEstudio,
+              verificacion: inforestuido.verificacion,
+            };
+
+            arrayEstudio.push(estudio);
+          }
+        }
+        //  console.log(arrayEstuido);
+        setListarInformacionEstudios(arrayEstudio);
       } catch (error) {
         console.log("Error al actualizar el valor", error);
       }
     }
   };
-  useEffect(() => { ListarRegistros(); }, [contract]);
-  
+
+  useEffect(() => {
+    ListarRegistros();
+  }, [contract]);
 
   useEffect(() => {
     async function Wallet() {
@@ -72,8 +103,6 @@ function App() {
     Wallet();
   }, []);
 
-
-
   return (
     <div>
       {MetaMask ? (
@@ -84,7 +113,9 @@ function App() {
             mostrarBalance={balance}
           />
           <div className="centro">
-            <Formulario />
+            <Formulario contrato ={contract} direccion = {account} />
+            <ListarData  
+            mostrarListados={ListarInformacionEstudios} />
           </div>
         </>
       ) : (
